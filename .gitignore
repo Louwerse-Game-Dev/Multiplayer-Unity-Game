@@ -3,6 +3,7 @@
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
 #
 /Multiplayer-game/[Ll]ibrary/
+/Multiplayer-game/[Uu]serSettings/
 /Multiplayer-game/[Tt]emp/
 /Multiplayer-game/[Oo]bj/
 /Multiplayer-game/[Bb]uild/
