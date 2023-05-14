@@ -44,5 +44,5 @@ jobs:
           prerelease: false
           title: "Release ${{ steps.version.outputs.version }}"
           files: |
-#            LICENSE.md
             release.zip
+#            LICENSE.md
