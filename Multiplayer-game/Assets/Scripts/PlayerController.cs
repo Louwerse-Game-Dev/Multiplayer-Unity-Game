@@ -1,32 +1,47 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
     public float movementSpeed;
 
-    private new Rigidbody2D rigidbody2D;
-    private Vector2 moveVelocity;
+    PlayerControls controls;
+    Vector2 moveInput;
+    Vector2 rotateInput;
+
+    // Awake is called before the Start function is called
+    void Awake()
+    {
+        controls = new PlayerControls();
+
+        // Configure events to listen to. 
+        // Use lambda to get result and update moveInput.
+        controls.Gameplay.Move.performed += context => moveInput = context.ReadValue<Vector2>();
+        controls.Gameplay.Move.canceled += context => moveInput = Vector2.zero;
+
+        // Use lambda to get result and update rotateInput.
+        controls.Gameplay.RotateTest.performed += context => rotateInput = context.ReadValue<Vector2>();
+        controls.Gameplay.RotateTest.canceled += context => rotateInput = Vector2.zero;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        // ...
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*  Check if input for horizontal / vertical movement is pressed.
-        *   To change this see 'Edit'->'Project Settings'->'Input'.
-        *   Input.GetAxis("...") wil return -1, 0 or 1 depending on what keys are pressed.
-        *   Use GetAxisRaw for a more 'snappy' style of movement, instead of the smooth movement of GetAxis.
-        */
-        Vector2 moveInput = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        // Player movement * movementSpeed
+        Vector2 move = new Vector2(moveInput.x, moveInput.y) * movementSpeed * Time.deltaTime;
+        transform.Translate(move, Space.World);
 
-        // Now multiply this by movementSpeed. normalized makes sure we do not move faster when moving diagonally.
-        moveVelocity = moveInput.normalized * movementSpeed;
+        // Player rotation (Controller input testing, might remove or change this later)
+        Vector3 rotate = new Vector3(0, 0, -rotateInput.x) * 300f * Time.deltaTime;
+        transform.Rotate(rotate, Space.World);
     }
 
     // FixedUpdate is called once per physics step
@@ -34,6 +49,20 @@ public class PlayerController : MonoBehaviour
     // and how fast/slow the framerate is.
     void FixedUpdate()
     {
-        rigidbody2D.MovePosition(rigidbody2D.position + moveVelocity * Time.fixedDeltaTime);
+        // ...
+    }
+
+    void OnEnable()
+    {
+        if (controls != null) {
+            controls.Gameplay.Enable();
+        }
+    }
+
+    void OnDisable()
+    {
+        if (controls != null) {
+            controls.Gameplay.Disable();
+        }
     }
 }
