@@ -7,23 +7,23 @@ public class PlayerController : MonoBehaviour
 {
     public float movementSpeed;
 
-    PlayerControls controls;
+    PlayerInput playerInput;
     Vector2 moveInput;
     Vector2 rotateInput;
 
     // Awake is called before the Start function is called
     void Awake()
     {
-        controls = new PlayerControls();
+        playerInput = GetComponent<PlayerInput>();
 
         // Configure events to listen to. 
         // Use lambda to get result and update moveInput.
-        controls.Gameplay.Move.performed += context => moveInput = context.ReadValue<Vector2>();
-        controls.Gameplay.Move.canceled += context => moveInput = Vector2.zero;
+        playerInput.actions["Move"].performed += context => moveInput = context.ReadValue<Vector2>();
+        playerInput.actions["Move"].canceled += context => moveInput = Vector2.zero;
 
         // Use lambda to get result and update rotateInput.
-        controls.Gameplay.RotateTest.performed += context => rotateInput = context.ReadValue<Vector2>();
-        controls.Gameplay.RotateTest.canceled += context => rotateInput = Vector2.zero;
+        playerInput.actions["RotateTest"].performed += context => rotateInput = context.ReadValue<Vector2>();
+        playerInput.actions["RotateTest"].canceled += context => rotateInput = Vector2.zero;
     }
 
     // Start is called before the first frame update
@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour
         transform.Translate(move, Space.World);
 
         // Player rotation (Controller input testing, might remove or change this later)
-        Vector3 rotate = new Vector3(0, 0, -rotateInput.x) * 300f * Time.deltaTime;
+        Vector3 rotate = new Vector3(0, 0, -rotateInput.x) * 50f * Time.deltaTime;
         transform.Rotate(rotate, Space.World);
     }
 
@@ -54,15 +54,15 @@ public class PlayerController : MonoBehaviour
 
     void OnEnable()
     {
-        if (controls != null) {
-            controls.Gameplay.Enable();
+        if (playerInput != null) {
+            playerInput.enabled = true;
         }
     }
 
     void OnDisable()
     {
-        if (controls != null) {
-            controls.Gameplay.Disable();
+        if (playerInput != null) {
+            playerInput.enabled = false;
         }
     }
 }

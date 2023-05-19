@@ -40,10 +40,19 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""name"": ""RotateTest"",
                     ""type"": ""Value"",
                     ""id"": ""8a6b4df1-4cad-4ff8-af3d-752432f98a41"",
-                    ""expectedControlType"": ""Stick"",
+                    ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Join Player"",
+                    ""type"": ""Button"",
+                    ""id"": ""ea40f411-64c7-43dd-9e75-21161f28097f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -115,6 +124,17 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""181cbbcf-223a-462f-b3f5-cc94e77471bf"",
+                    ""path"": ""<Pointer>/delta"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""RotateTest"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""8ca072d3-198b-464e-8732-adcc02c3b5f8"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
@@ -125,59 +145,26 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""2D Vector"",
-                    ""id"": ""7e4cadba-8059-4233-a896-3c07d933863e"",
-                    ""path"": ""2DVector"",
+                    ""name"": """",
+                    ""id"": ""52e203e1-1952-4169-975a-4ecdef3ef1d2"",
+                    ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""RotateTest"",
-                    ""isComposite"": true,
+                    ""action"": ""Join Player"",
+                    ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
                 {
-                    ""name"": ""up"",
-                    ""id"": ""f45b8d57-3036-46e8-9000-e9d0534dfdc1"",
-                    ""path"": """",
+                    ""name"": """",
+                    ""id"": ""33f8ab2d-b2f2-4a00-a077-7cd42cf9b7b2"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""RotateTest"",
+                    ""action"": ""Join Player"",
                     ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""down"",
-                    ""id"": ""c3f4277c-4261-4c97-8632-307523206864"",
-                    ""path"": """",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RotateTest"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""left"",
-                    ""id"": ""1ef37157-cd1f-494d-a41a-125477cf197f"",
-                    ""path"": ""<Keyboard>/leftArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RotateTest"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
-                },
-                {
-                    ""name"": ""right"",
-                    ""id"": ""ad9cfda4-ac66-47d1-be34-5eefb11614cc"",
-                    ""path"": ""<Keyboard>/rightArrow"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""RotateTest"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": true
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -188,6 +175,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
         m_Gameplay_Move = m_Gameplay.FindAction("Move", throwIfNotFound: true);
         m_Gameplay_RotateTest = m_Gameplay.FindAction("RotateTest", throwIfNotFound: true);
+        m_Gameplay_JoinPlayer = m_Gameplay.FindAction("Join Player", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -251,12 +239,14 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private List<IGameplayActions> m_GameplayActionsCallbackInterfaces = new List<IGameplayActions>();
     private readonly InputAction m_Gameplay_Move;
     private readonly InputAction m_Gameplay_RotateTest;
+    private readonly InputAction m_Gameplay_JoinPlayer;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
         public GameplayActions(@PlayerControls wrapper) { m_Wrapper = wrapper; }
         public InputAction @Move => m_Wrapper.m_Gameplay_Move;
         public InputAction @RotateTest => m_Wrapper.m_Gameplay_RotateTest;
+        public InputAction @JoinPlayer => m_Wrapper.m_Gameplay_JoinPlayer;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -272,6 +262,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @RotateTest.started += instance.OnRotateTest;
             @RotateTest.performed += instance.OnRotateTest;
             @RotateTest.canceled += instance.OnRotateTest;
+            @JoinPlayer.started += instance.OnJoinPlayer;
+            @JoinPlayer.performed += instance.OnJoinPlayer;
+            @JoinPlayer.canceled += instance.OnJoinPlayer;
         }
 
         private void UnregisterCallbacks(IGameplayActions instance)
@@ -282,6 +275,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @RotateTest.started -= instance.OnRotateTest;
             @RotateTest.performed -= instance.OnRotateTest;
             @RotateTest.canceled -= instance.OnRotateTest;
+            @JoinPlayer.started -= instance.OnJoinPlayer;
+            @JoinPlayer.performed -= instance.OnJoinPlayer;
+            @JoinPlayer.canceled -= instance.OnJoinPlayer;
         }
 
         public void RemoveCallbacks(IGameplayActions instance)
@@ -303,5 +299,6 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     {
         void OnMove(InputAction.CallbackContext context);
         void OnRotateTest(InputAction.CallbackContext context);
+        void OnJoinPlayer(InputAction.CallbackContext context);
     }
 }
