@@ -23,7 +23,7 @@ public class TitleScreenManager : MonoBehaviour
     public void startMultiplayer()
     {
         SceneManager.LoadScene(1);
-        // Todo: call GameManager -> toggleLocalCoop()
+        MasterManager.GameManager.toggleLocalCoop();
     }
 
     public void quitGame()

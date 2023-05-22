@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Todo: this should probably be a Singleton
+// Todo: this should probably be a Singleton see: https://gist.github.com/rickyah/271e3aa31ff8079365bc ?
 public class GameManager : MonoBehaviour
 {
     PlayerInputManager playerInputManager;
