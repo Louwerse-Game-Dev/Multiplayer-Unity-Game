@@ -367,5 +367,49 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_DefaultControlScheme
+      value: Keyboard & mouse
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_NotificationBehavior
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_ActionEvents.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_ActionEvents.Array.data[0].m_ActionId
+      value: 7ab0d89f-db94-45a3-b6ee-24ad6064fbd1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_ActionEvents.Array.data[1].m_ActionId
+      value: 8a6b4df1-4cad-4ff8-af3d-752432f98a41
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_ActionId
+      value: ea40f411-64c7-43dd-9e75-21161f28097f
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_ActionEvents.Array.data[0].m_ActionName
+      value: Gameplay/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_ActionEvents.Array.data[1].m_ActionName
+      value: Gameplay/RotateTest[/Mouse/delta]
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383485960697941, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_ActionEvents.Array.data[2].m_ActionName
+      value: Gameplay/Join Player[/Keyboard/space]
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383486412559099, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_Name
+      value: Player Camera
+      objectReference: {fileID: 0}
+    - target: {fileID: 8209383486412559099, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}
+      propertyPath: m_TagString
+      value: PlayerCamera
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: bfcc0dd5f8909c146ac95e568ca68049, type: 3}

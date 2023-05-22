@@ -26,12 +26,6 @@ public class PlayerController : MonoBehaviour
         playerInput.actions["RotateTest"].canceled += context => rotateInput = Vector2.zero;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // ...
-    }
-
     // Update is called once per frame
     void Update()
     {
@@ -42,14 +36,6 @@ public class PlayerController : MonoBehaviour
         // Player rotation (Controller input testing, might remove or change this later)
         Vector3 rotate = new Vector3(0, 0, -rotateInput.x) * 50f * Time.deltaTime;
         transform.Rotate(rotate, Space.World);
-    }
-
-    // FixedUpdate is called once per physics step
-    // Can run once, zero, or several times per frame, depending on how many physics frames per second are set in the time settings, 
-    // and how fast/slow the framerate is.
-    void FixedUpdate()
-    {
-        // ...
     }
 
     void OnEnable()
