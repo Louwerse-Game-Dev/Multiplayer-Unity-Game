@@ -4,8 +4,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // Todo: this should probably be a Singleton
-public class TitleScreenManager : MonoBehaviour
+public class TitleScreenManager : MonoBehaviourSingleton<TitleScreenManager>
 {
+    [SerializeField]
+    private GameManager gameManager;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -23,7 +26,7 @@ public class TitleScreenManager : MonoBehaviour
     public void startMultiplayer()
     {
         SceneManager.LoadScene(1);
-        // Todo: call GameManager -> toggleLocalCoop()
+        gameManager.toggleLocalCoop();
     }
 
     public void quitGame()
