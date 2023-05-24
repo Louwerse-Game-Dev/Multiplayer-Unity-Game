@@ -41,9 +41,7 @@ public class PlayerController : MonoBehaviour
     [ContextMenu("Toggle PlayerInput")]
     public void togglePlayerInput()
     {
-        if (playerInput == null) {
-            return;
-        }
+        if (playerInput == null) return;
         
         playerInput.enabled = playerInput.enabled == false;
     }
