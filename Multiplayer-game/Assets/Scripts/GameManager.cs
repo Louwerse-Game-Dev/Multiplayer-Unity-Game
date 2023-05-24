@@ -11,29 +11,35 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     // Start is called before the first frame update
     void Start()
     {
-        // Todo: make these configurable in the Settings Menu later?
-        Screen.SetResolution(1920, 1080, FullScreenMode.MaximizedWindow, 60);
-
         playerInputManager = GetComponent<PlayerInputManager>();
     }
 
-    // Update is called once per frame
-    void Update()
+    [ContextMenu("Toggle PlayerInputManager (Local Co-Op)")]
+    public void togglePlayerInputManager()
     {
+        if (playerInputManager == null) {
+            return;
+        }
         
-    }
-
-    // Todo: We should make this a Singleton so we can call this function from the Main Menu.
-    [ContextMenu("Toggle Local Co-Op")]
-    public void toggleLocalCoop()
-    {
         playerInputManager.enabled = playerInputManager.enabled == false;
     }
 
-    // Todo: We should make this a Singleton so we can call this function from Menu scenes.
     [ContextMenu("Toggle Split Screen")]
     public void toggleSplitScreen()
     {
+        if (playerInputManager == null) {
+            return;
+        }
         playerInputManager.splitScreen = playerInputManager.splitScreen == false;
+    }
+
+    void OnEnable()
+    {
+        togglePlayerInputManager();
+    }
+
+    void OnDisable()
+    {
+        togglePlayerInputManager();
     }
 }

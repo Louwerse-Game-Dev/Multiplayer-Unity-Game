@@ -38,17 +38,27 @@ public class PlayerController : MonoBehaviour
         transform.Rotate(rotate, Space.World);
     }
 
+    [ContextMenu("Toggle PlayerInput")]
+    public void togglePlayerInput()
+    {
+        if (playerInput == null) {
+            return;
+        }
+        
+        playerInput.enabled = playerInput.enabled == false;
+    }
+
     void OnEnable()
     {
-        if (playerInput != null) {
-            playerInput.enabled = true;
+        if (playerInput != null && playerInput.enabled == false) {
+            togglePlayerInput();
         }
     }
 
     void OnDisable()
     {
-        if (playerInput != null) {
-            playerInput.enabled = false;
+        if (playerInput != null && playerInput.enabled == true) {
+            togglePlayerInput();
         }
     }
 }

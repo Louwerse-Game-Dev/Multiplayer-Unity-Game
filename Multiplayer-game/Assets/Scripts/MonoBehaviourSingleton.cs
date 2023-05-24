@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+// Source: https://gist.github.com/rickyah/271e3aa31ff8079365bc
 /// <summary>
 ///     This is a generic Singleton implementation for Monobehaviours.
 ///     Create a derived class where the type T is the script you want to "Singletonize"
