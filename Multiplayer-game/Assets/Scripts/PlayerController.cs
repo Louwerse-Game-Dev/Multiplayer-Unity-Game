@@ -59,4 +59,16 @@ public class PlayerController : MonoBehaviour
             togglePlayerInput();
         }
     }
+
+    public void OnDeviceLost(PlayerInput playerInput)
+    {
+        // Todo: some sort of forced pause menu
+        Debug.Log("Device Lost");
+    }
+
+    public void OnDeviceRegained(PlayerInput playerInput)
+    {
+        // Todo: close forced pause menu
+        Debug.Log("Device Regained");
+    }
 }

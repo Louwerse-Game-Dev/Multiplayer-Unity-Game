@@ -92,7 +92,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             return false;
         }
 
-        Debug.Log(playerCameras.Length);
         foreach (GameObject playerCamera in playerCameras) {
             if (playerCamera == currentPlayerCamera) continue;
 
