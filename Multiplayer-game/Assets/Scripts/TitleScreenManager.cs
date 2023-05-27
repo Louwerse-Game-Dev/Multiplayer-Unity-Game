@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 // Todo: this should probably be a Singleton
@@ -20,6 +21,7 @@ public class TitleScreenManager : MonoBehaviourSingleton<TitleScreenManager>
     public void startSinglePlayer()
     {
         SceneManager.LoadScene(1);
+        SceneManager.sceneLoaded += OnSinglePlayerLoaded;
     }
 
     [ContextMenu("Start Multiplayer")]
@@ -32,16 +34,15 @@ public class TitleScreenManager : MonoBehaviourSingleton<TitleScreenManager>
     }
 
     // Source: https://forum.unity.com/threads/call-a-function-after-the-scene-is-loaded.1207291/
+    void OnSinglePlayerLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Instantiate(gameManager.GetComponent<PlayerInputManager>().playerPrefab);
+    }
+
+    // Source: https://forum.unity.com/threads/call-a-function-after-the-scene-is-loaded.1207291/
     void OnLocalCoopLoaded(Scene scene, LoadSceneMode mode)
     {
         gameManager.togglePlayerInputManager();
-
-        // Remove the default (singlePlayer) player object.
-        // Todo: just remove the player object from the game scene and initialize one on startSinglePlayer()?
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null) {
-            GameObject.Destroy(player);
-        }
     }
 
     public void quitGame()

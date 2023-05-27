@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEditor;
 
 // Todo: this should probably be a Singleton see: https://gist.github.com/rickyah/271e3aa31ff8079365bc ?
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
+    [SerializeField]
+    private List<GameObject> players;
     PlayerInputManager playerInputManager;
 
     // Start is called before the first frame update
@@ -29,16 +32,17 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         if (playerInputManager == null) return;
 
         // Find all cameras with these tags:
-        string[] tags = {"MainCamera", "PlayerCamera"};
-        GameObject[] cameras = FindInActiveObjectsByTags(tags);
+        GameObject mainCamera = FindInActiveObjectByTag("MainCamera");
+        GameObject[] playerCameras = FindInActiveObjectsByTag("PlayerCamera");
 
-        // Todo: find out why we find 1 PlayerCamera to many? Left over from the SinglePlayer player object?
-        // Debug.Log("Found " + cameras.Length + " Cameras");
+        if (mainCamera == null) return;
+
         playerInputManager.splitScreen = playerInputManager.splitScreen == false;
 
         // Toggle which cameras are enabled.
-        foreach (GameObject camera in cameras) {
-            camera.SetActive(camera.activeSelf == false);
+        mainCamera.SetActive(mainCamera.activeSelf == false);
+        foreach (GameObject playerCamera in playerCameras) {
+            playerCamera.SetActive(playerCamera.activeSelf == false);
         }
     }
 
@@ -56,41 +60,65 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
     }
 
+    private void updateMainCameraTargets()
+    {
+        GameObject mainCamera = FindInActiveObjectByTag("MainCamera");
+
+        if (mainCamera == null) return;
+
+        mainCamera.GetComponent<MultipleTargetCamera>().targets = players;
+    }
+
     /*
     * The OnPlayerJoined event triggered by the playerInputManager.
     */
-    void OnPlayerJoined(PlayerInput playerObject)
+    void OnPlayerJoined(PlayerInput playerInput)
     {
-        Transform playerCameraTransform = playerObject.transform.Find("Player Camera");
+        if (players.Contains(playerInput.gameObject) == false) {
+            players.Add(playerInput.gameObject);
+        }
+        updateMainCameraTargets();
+
+        Transform playerCameraTransform = playerInput.transform.Find("Player Camera");
         if (playerCameraTransform == null) {
             Debug.LogError("OnPlayerJoined player has no Player Camera transform");
             return;
         }
 
         GameObject playerCameraObject = playerCameraTransform.gameObject;
-        // Todo: if player camera disabled... return?
         Camera playerCamera = playerCameraObject.GetComponent<Camera>();
 
+        // Check if we have a playerCamera with an AudioListener enabled, if so disable the AudioListener of this new playerCamera.
         if (CamWithAudioListener(playerCameraObject)) {
             playerCamera.GetComponent<AudioListener>().enabled = false;
+        }
+
+        // If splitScreen is disabled we should disable the playerCamera.
+        if (playerInputManager.splitScreen == false && playerCameraObject.activeSelf == true) {
+            playerCameraObject.SetActive(playerCameraObject.activeSelf == false);
         }
     }
 
     /*
     * The onPlayerLeft event triggered by the playerInputManager.
     */
-    void OnPlayerLeft(PlayerInput playerObject)
+    void OnPlayerLeft(PlayerInput playerInput)
     {
-        Transform playerCameraTransform = playerObject.transform.Find("Player Camera");
+        if (players.Contains(playerInput.gameObject) == true) {
+            players.Remove(playerInput.gameObject);
+        }
+        updateMainCameraTargets();
+
+        Transform playerCameraTransform = playerInput.transform.Find("Player Camera");
         if (playerCameraTransform == null) {
             Debug.LogError("OnPlayerLeft player has no Player Camera transform");
             return;
         }
 
         GameObject playerCameraObject = playerCameraTransform.gameObject;
-        // Todo: if player camera disabled... return?
         Camera playerCamera = playerCameraObject.GetComponent<Camera>();
 
+        // Check if we still have a playerCamera with an AudioListener enabled, if not enable the AudioListener of an other playerCamera.
         if (playerCamera.GetComponent<AudioListener>().enabled) {
             playerCamera.GetComponent<AudioListener>().enabled = false;
 
@@ -111,7 +139,11 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
 
         foreach (GameObject playerCamera in playerCameras) {
-            if (playerCamera == currentPlayerCamera) continue;
+            if (players.Contains(playerCamera.transform.parent.gameObject) == false 
+                || playerCamera == currentPlayerCamera) 
+            {
+                continue;
+            }
 
             if (playerCamera.GetComponent<AudioListener>().enabled == true) {
                 return true;
@@ -134,8 +166,12 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
 
         foreach (GameObject playerCamera in playerCameras) {
-            if (playerCamera.GetComponent<AudioListener>().enabled == false) {
+            if (players.Contains(playerCamera.transform.parent.gameObject) == true 
+                && playerCamera.GetComponent<AudioListener>().enabled == false) 
+            {
                 playerCamera.GetComponent<AudioListener>().enabled = true;
+
+                return;
             }
         }
     }
@@ -143,21 +179,58 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     /*
     * Source: https://stackoverflow.com/questions/44456133/find-inactive-gameobject-by-name-tag-or-layer
     */
-    GameObject[] FindInActiveObjectsByTags(string[] tags)
+    GameObject FindInActiveObjectByTag(string tag)
     {
-        List<GameObject> validTransforms = new List<GameObject>();
-        Transform[] objectTransforms = Resources.FindObjectsOfTypeAll<Transform>() as Transform[];
+        List<GameObject> validObjectsInScene = new List<GameObject>();
 
-        foreach (Transform objectTransform in objectTransforms)
+        // WARNING: Read this -> https://docs.unity3d.com/ScriptReference/Resources.FindObjectsOfTypeAll.html
+        foreach (GameObject gameObject in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
         {
-            if (objectTransform.hideFlags != HideFlags.None) continue;
-
-            foreach (string tag in tags) {
-                if (objectTransform.CompareTag(tag) == false) continue;
-
-                validTransforms.Add(objectTransform.gameObject);
+            if (EditorUtility.IsPersistent(gameObject.transform.root.gameObject) 
+                || gameObject.hideFlags == HideFlags.NotEditable 
+                || gameObject.hideFlags == HideFlags.HideAndDontSave)
+            {
+                continue;
             }
+
+            if (gameObject.transform.CompareTag(tag) == false) continue;
+
+            validObjectsInScene.Add(gameObject);
         }
-        return validTransforms.ToArray();
+
+        if (validObjectsInScene.Count == 1) {
+            return validObjectsInScene[0];
+        }
+
+        if (validObjectsInScene.Count > 1) {
+            Debug.LogError("FindInActiveObjectByTag() => Found more than 1 object with tag " + tag);
+        }
+
+        return null;
+    }
+
+    /*
+    * Source: https://stackoverflow.com/questions/44456133/find-inactive-gameobject-by-name-tag-or-layer
+    */
+    GameObject[] FindInActiveObjectsByTag(string tag)
+    {
+        List<GameObject> validObjectsInScene = new List<GameObject>();
+
+        // WARNING: Read this -> https://docs.unity3d.com/ScriptReference/Resources.FindObjectsOfTypeAll.html
+        foreach (GameObject gameObject in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
+        {
+            if (EditorUtility.IsPersistent(gameObject.transform.root.gameObject) 
+                || gameObject.hideFlags == HideFlags.NotEditable 
+                || gameObject.hideFlags == HideFlags.HideAndDontSave)
+            {
+                continue;
+            }
+
+            if (gameObject.transform.CompareTag(tag) == false) continue;
+
+            validObjectsInScene.Add(gameObject);
+        }
+
+        return validObjectsInScene.ToArray();
     }
 }
