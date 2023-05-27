@@ -70,8 +70,6 @@ public class MultipleTargetCamera : MonoBehaviour
     {
         float greatestDistance = Mathf.Max(bounds.size.x, bounds.size.y);
 
-        Debug.Log(greatestDistance);
-
         if (greatestDistance < minDistForZoom) return minDistForZoom;
 
         return greatestDistance;
