@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
 
+[RequireComponent(typeof(PlayerInput))]
 public class PlayerController : MonoBehaviour
 {
     public float movementSpeed;
@@ -41,21 +43,19 @@ public class PlayerController : MonoBehaviour
     [ContextMenu("Toggle PlayerInput")]
     public void togglePlayerInput()
     {
-        if (playerInput == null) return;
-        
         playerInput.enabled = playerInput.enabled == false;
     }
 
     void OnEnable()
     {
-        if (playerInput != null && playerInput.enabled == false) {
+        if (playerInput.enabled == false) {
             togglePlayerInput();
         }
     }
 
     void OnDisable()
     {
-        if (playerInput != null && playerInput.enabled == true) {
+        if (playerInput.enabled == true) {
             togglePlayerInput();
         }
     }
@@ -66,6 +66,7 @@ public class PlayerController : MonoBehaviour
     public void OnDeviceLost(PlayerInput playerInput)
     {
         // Todo: some sort of forced pause menu
+        // Todo: after waiting to long trigger GameManager.OnPlayerLeft here? (use this? https://forum.unity.com/threads/manually-trigger-navigation-events-in-script.874213/)
         Debug.Log("Device Lost");
     }
 

@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEditor;
 
 // Todo: this should probably be a Singleton see: https://gist.github.com/rickyah/271e3aa31ff8079365bc ?
+[RequireComponent(typeof(PlayerInputManager))]
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
     [SerializeField]
@@ -20,8 +21,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     [ContextMenu("Toggle PlayerInputManager (Local Co-Op)")]
     public void togglePlayerInputManager()
     {
-        if (playerInputManager == null) return;
-        
         playerInputManager.enabled = playerInputManager.enabled == false;
     }
 
@@ -29,8 +28,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     // Todo: make this configurable in the Settings Menu later?
     public void toggleSplitScreen()
     {
-        if (playerInputManager == null) return;
-
         // Find all cameras with these tags:
         GameObject mainCamera = FindInActiveObjectByTag("MainCamera");
         GameObject[] playerCameras = FindInActiveObjectsByTag("PlayerCamera");
@@ -48,14 +45,14 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     void OnEnable()
     {
-        if (playerInputManager != null && playerInputManager.enabled == false) {
+        if (playerInputManager.enabled == false) {
             togglePlayerInputManager();
         }
     }
 
     void OnDisable()
     {
-        if (playerInputManager != null && playerInputManager.enabled == true) {
+        if (playerInputManager.enabled == true) {
             togglePlayerInputManager();
         }
     }
@@ -177,6 +174,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     }
 
     /*
+    * Get a single inactive (or active) object by tag, careful with this function.
     * Source: https://stackoverflow.com/questions/44456133/find-inactive-gameobject-by-name-tag-or-layer
     */
     GameObject FindInActiveObjectByTag(string tag)
@@ -210,6 +208,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     }
 
     /*
+    * Get a all inactive (and/or active) objects by tag, careful with this function.
     * Source: https://stackoverflow.com/questions/44456133/find-inactive-gameobject-by-name-tag-or-layer
     */
     GameObject[] FindInActiveObjectsByTag(string tag)
