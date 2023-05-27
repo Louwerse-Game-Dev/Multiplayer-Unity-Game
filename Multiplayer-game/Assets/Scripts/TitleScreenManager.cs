@@ -26,7 +26,7 @@ public class TitleScreenManager : MonoBehaviourSingleton<TitleScreenManager>
     public void startMultiplayer()
     {
         // Todo: Load a specific scene for local coop instead, where players can join and choose a character?
-        // Todo: ^ if we do this we longer need do run 'OnLocalCoopLoaded' code after sceneLoaded.
+        // Todo: ^ if we do this we can run 'OnLocalCoopLoaded' code here instead of after sceneLoaded.
         SceneManager.LoadScene(1);
         SceneManager.sceneLoaded += OnLocalCoopLoaded;
     }
@@ -38,9 +38,9 @@ public class TitleScreenManager : MonoBehaviourSingleton<TitleScreenManager>
 
         // Remove the default (singlePlayer) player object.
         // Todo: just remove the player object from the game scene and initialize one on startSinglePlayer()?
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        if (players != null && players.Length == 1) {
-            GameObject.Destroy(players[0]);
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null) {
+            GameObject.Destroy(player);
         }
     }
 

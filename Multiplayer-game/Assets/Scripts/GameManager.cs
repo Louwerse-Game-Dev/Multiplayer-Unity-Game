@@ -17,19 +17,29 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     [ContextMenu("Toggle PlayerInputManager (Local Co-Op)")]
     public void togglePlayerInputManager()
     {
-        if (playerInputManager == null) {
-            return;
-        }
+        if (playerInputManager == null) return;
         
         playerInputManager.enabled = playerInputManager.enabled == false;
     }
 
     [ContextMenu("Toggle Split Screen")]
+    // Todo: make this configurable in the Settings Menu later?
     public void toggleSplitScreen()
     {
         if (playerInputManager == null) return;
 
+        // Find all cameras with these tags:
+        string[] tags = {"MainCamera", "PlayerCamera"};
+        GameObject[] cameras = FindInActiveObjectsByTags(tags);
+
+        // Todo: find out why we find 1 PlayerCamera to many? Left over from the SinglePlayer player object?
+        // Debug.Log("Found " + cameras.Length + " Cameras");
         playerInputManager.splitScreen = playerInputManager.splitScreen == false;
+
+        // Toggle which cameras are enabled.
+        foreach (GameObject camera in cameras) {
+            camera.SetActive(camera.activeSelf == false);
+        }
     }
 
     void OnEnable()
@@ -46,6 +56,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
     }
 
+    /*
+    * The OnPlayerJoined event triggered by the playerInputManager.
+    */
     void OnPlayerJoined(PlayerInput playerObject)
     {
         Transform playerCameraTransform = playerObject.transform.Find("Player Camera");
@@ -55,6 +68,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
 
         GameObject playerCameraObject = playerCameraTransform.gameObject;
+        // Todo: if player camera disabled... return?
         Camera playerCamera = playerCameraObject.GetComponent<Camera>();
 
         if (CamWithAudioListener(playerCameraObject)) {
@@ -62,6 +76,9 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
     }
 
+    /*
+    * The onPlayerLeft event triggered by the playerInputManager.
+    */
     void OnPlayerLeft(PlayerInput playerObject)
     {
         Transform playerCameraTransform = playerObject.transform.Find("Player Camera");
@@ -71,6 +88,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         }
 
         GameObject playerCameraObject = playerCameraTransform.gameObject;
+        // Todo: if player camera disabled... return?
         Camera playerCamera = playerCameraObject.GetComponent<Camera>();
 
         if (playerCamera.GetComponent<AudioListener>().enabled) {
@@ -120,5 +138,26 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
                 playerCamera.GetComponent<AudioListener>().enabled = true;
             }
         }
+    }
+
+    /*
+    * Source: https://stackoverflow.com/questions/44456133/find-inactive-gameobject-by-name-tag-or-layer
+    */
+    GameObject[] FindInActiveObjectsByTags(string[] tags)
+    {
+        List<GameObject> validTransforms = new List<GameObject>();
+        Transform[] objectTransforms = Resources.FindObjectsOfTypeAll<Transform>() as Transform[];
+
+        foreach (Transform objectTransform in objectTransforms)
+        {
+            if (objectTransform.hideFlags != HideFlags.None) continue;
+
+            foreach (string tag in tags) {
+                if (objectTransform.CompareTag(tag) == false) continue;
+
+                validTransforms.Add(objectTransform.gameObject);
+            }
+        }
+        return validTransforms.ToArray();
     }
 }
